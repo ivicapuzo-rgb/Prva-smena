@@ -1,0 +1,31 @@
+{
+  "summary": "Frontend-only Expo web preview tested at 390x844 mobile viewport. All critical flows (login, home totals, date nav, pumps, fuel numpad+entries, history sheet, buses CRUD, logout, local persistence across reload) passed. Minor non-blocking RN deprecation warning: 'props.pointerEvents is deprecated. Use style.pointerEvents' emitted at runtime (likely from a dependency / internal component).",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [],
+    "react_native_issues": [
+      {"component": "pointerEvents prop", "issue": "Runtime console warning: 'props.pointerEvents is deprecated. Use style.pointerEvents'. Non-blocking but should be migrated. Likely in an internal UI component (Sheet/overlay) or dependency. Search codebase for pointerEvents=\"...\" prop and move to style={{ pointerEvents: ... }}."}
+    ]
+  },
+  "test_report_links": [],
+  "action_items": [
+    "Migrate any `pointerEvents` JSX prop usages to `style.pointerEvents` to silence RN deprecation warning (non-blocking).",
+    "On web, native Share is not available; Excel export relies on XLSX.writeFile download and PDF uses print dialog — this was observed to not throw and is correct for web preview. Validate real file download UX on a device build."
+  ],
+  "critical_code_review_comments": [
+    "store.tsx: `updateShift` persists every keystroke via storage.setItem — fine for AsyncStorage but could churn I/O on web; consider debouncing for pump inputs.",
+    "fuel.tsx: entry.qty strips trailing comma but does not validate numeric format beyond num(qty)>0; acceptable given numpad input.",
+    "buses.tsx: `canAdd` requires length>=3, matches intent; search filter uses `includes` (substring) which is fine.",
+    "login.tsx: ADMIN_PASSWORD hardcoded ('puzopb') per user requirement — acceptable for offline personal app, but note it is in source.",
+    "No test for Excel/PDF export triggered via browser download because exports use XLSX.writeFile/print; not easily asserted in Playwright. Reported as untested, not failing."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A (no backend)", "frontend": "100%"},
+  "seed_data_creation": "Created runtime shift data (today's date) via UI: pumps 1&2 (50 + 75 = 125 L diff), fuel entries 7000 (50.5 L, card НЕ) and 7013 (25 L, card ДА). Added+removed test bus 9999. Data persisted via local storage across logout and full reload.",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "App is pure offline; no backend. Admin password 'puzopb'. Default bus list in /app/frontend/src/data/buses.ts (276 entries, 7000 present, 1234 not). Expo web served at http://localhost:3000. Mobile viewport 390x844. All testIDs documented in review_request worked as expected including tab-home/tab-pumps/tab-fuel/tab-history, numpad-0..9/comma/del, fuel-card-yes/no, fuel-entry-<bus>, bus-remove-<n>, history-item-YYYY-MM-DD. Native share and real file-download not asserted (web preview limitation).",
+  "rca_of_issue": "N/A — no failing scenarios observed."
+}

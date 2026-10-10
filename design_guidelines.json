@@ -1,0 +1,149 @@
+{
+  "app_name": "ГСП Точење Горива",
+  "personality": "5 Brutalist Mobile",
+  "personality_one_liner": "An industrial, high-contrast, poster-like utility interface designed for maximum legibility, fast numeric entry, and operational clarity outdoors.",
+  "color": {
+    "surface": "#FFFFFF",
+    "onSurface": "#09090B",
+    "surfaceSecondary": "#F4F4F5",
+    "onSurfaceSecondary": "#09090B",
+    "surfaceTertiary": "#E4E4E7",
+    "onSurfaceTertiary": "#09090B",
+    "surfaceInverse": "#09090B",
+    "onSurfaceInverse": "#FFFFFF",
+    "brand": "#F97316",
+    "onBrand": "#FFFFFF",
+    "brandPrimary": "#EA580C",
+    "onBrandPrimary": "#FFFFFF",
+    "brandSecondary": "#C2410C",
+    "onBrandSecondary": "#FFFFFF",
+    "brandTertiary": "#FFEDD5",
+    "onBrandTertiary": "#9A3412",
+    "success": "#16A34A",
+    "onSuccess": "#FFFFFF",
+    "warning": "#EAB308",
+    "onWarning": "#000000",
+    "error": "#DC2626",
+    "onError": "#FFFFFF",
+    "info": "#09090B",
+    "onInfo": "#FFFFFF",
+    "border": "#E4E4E7",
+    "borderStrong": "#27272A",
+    "divider": "#E4E4E7",
+    "muted": "#71717A"
+  },
+  "typography": {
+    "displayFontFamily": "Archivo",
+    "textFontFamily": "JetBrains Mono",
+    "scale": {
+      "sm": 12,
+      "base": 14,
+      "lg": 16,
+      "xl": 20,
+      "2xl": 24
+    }
+  },
+  "spacing": {
+    "rule": "Use rigid grids, hard alignment, and visible spacing systems. Inputs must have massive touch targets for workers using gloves.",
+    "xs": 4,
+    "sm": 8,
+    "md": 12,
+    "lg": 16,
+    "xl": 24,
+    "2xl": 32,
+    "3xl": 48
+  },
+  "radius_tokens": {
+    "sm": 0,
+    "md": 0,
+    "lg": 0,
+    "pill": 999
+  },
+  "shadow_tier": "0",
+  "navigation": "bottom_tabs",
+  "icon_set": "Phosphor",
+  "glassmorphism": {
+    "enabled": false,
+    "do's": [],
+    "dont's": [
+      "Do not use glass or blur. Everything must be solid, high-contrast, and industrial."
+    ]
+  },
+  "platform_libraries": {
+    "glass": {
+      "ios": "expo-glass-effect",
+      "android": "expo-blur",
+      "low_end_android_fallback": "solid surfaceSecondary"
+    },
+    "image": "expo-image",
+    "blur": "expo-blur",
+    "bottom_sheet": "@gorhom/bottom-sheet",
+    "animation": "react-native-reanimated",
+    "gesture": "react-native-gesture-handler"
+  },
+  "screens": [
+    {
+      "name": "Home / Active Shift (Почетна)",
+      "purpose": "Overview of the current day's shift (07h-15h) and total pumped liters.",
+      "states": {
+        "loading": "Spinner in the center",
+        "empty": "No active shift, button to start a new day.",
+        "error": "Error loading shift data, retry button."
+      },
+      "layout": "Massive oversized date header. Huge counter for 'УКУПНА РАЗЛИКА' (Total difference). Two massive navigation blocks for 'Аутомати' (Pumps) and 'Точење' (Bus Entry)."
+    },
+    {
+      "name": "Pumps (Аутомати 1-8)",
+      "purpose": "Log start and end states for the 8 fuel pumps.",
+      "states": {
+        "loading": "Skeleton of 8 rigid cards.",
+        "empty": "N/A - always 8 pumps.",
+        "error": "Failed to save pump state."
+      },
+      "layout": "Grid of 8 blocks. Each block has heavy borders. Inputs for 'Почетно стање' and 'Завршно стање'. 'Разлика' is auto-calculated and displayed in a high-contrast mono block."
+    },
+    {
+      "name": "Bus Fuel Entry (Точење Горива)",
+      "purpose": "High-speed numeric data entry for buses being fueled.",
+      "states": {
+        "loading": "N/A",
+        "empty": "Empty state illustration of a parked bus when no buses are logged yet today.",
+        "error": "Invalid garage number or missing quantity."
+      },
+      "layout": "Top half: Inputs for 'Г.бр.' (Garage Number) and 'ЛИТАРА' (Liters). Big toggle switch for 'Картица ОК' (Card OK: Да/Не). Bottom half: A massive custom on-screen numeric keypad (Numpad) spanning the full width for rapid, glove-friendly input without native keyboard popups."
+    },
+    {
+      "name": "History & Export (Историја)",
+      "purpose": "View past shifts and export to Excel/PDF.",
+      "states": {
+        "loading": "List skeleton.",
+        "empty": "Illustration of an empty clipboard. Message 'Нема сачуваних смена'.",
+        "error": "Failed to load history."
+      },
+      "layout": "List of past dates. Tapping a date opens a bottom sheet with summary data and two giant brutalist buttons: 'Експорт Excel' and 'Експорт PDF'."
+    }
+  ],
+  "images": {
+    "hero_bg": {
+      "url": "https://images.unsplash.com/photo-1654334036171-e01e52b2ce8e?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1ODh8MHwxfHNlYXJjaHwxfHxpbmR1c3RyaWFsJTIwZnVlbCUyMHB1bXAlMjBtYWNoaW5lcnl8ZW58MHx8fHwxNzkxNjI0ODk1fDA&ixlib=rb-4.1.0&q=85",
+      "alt": "industrial fuel pump machinery"
+    },
+    "empty_history": {
+      "url": "https://images.unsplash.com/photo-1651760680066-db9d32bd0357?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1MDZ8MHwxfHNlYXJjaHwxfHxlbXB0eSUyMGNsaXBib2FyZCUyMHBhcGVyJTIwZGVza3xlbnwwfHx8fDE3OTE2MjQ4OTV8MA&ixlib=rb-4.1.0&q=85",
+      "alt": "empty clipboard paper desk"
+    },
+    "empty_buses": {
+      "url": "https://images.unsplash.com/photo-1557223562-6c77ef16210f?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Njd8MHwxfHNlYXJjaHwxfHxjaXR5JTIwYnVzJTIwcGFya2VkJTIwZW1wdHl8ZW58MHx8fHwxNzkxNjI0ODk1fDA&ixlib=rb-4.1.0&q=85",
+      "alt": "city bus parked empty"
+    }
+  },
+  "instructions_to_main_agent": [
+    "CRITICAL: The entire UI must be in Serbian Cyrillic script as requested by the user. Do not use Latin script for labels (e.g., use 'Почетно стање', 'Завршно стање', 'Г.бр.', 'Точена количина', 'Експорт у Excel').",
+    "CRITICAL: The app is purely offline. Use AsyncStorage or SQLite for storing shift data, pump readings, and bus logs.",
+    "Data export requires actual generation of .xlsx and .pdf files. You must use libraries like `xlsx` (SheetJS) or `exceljs` for Excel, and `expo-print` or `react-native-html-to-pdf` for PDF generation, then share them via `expo-sharing`.",
+    "IMPLEMENT A CUSTOM NUMERIC KEYPAD: Research shows native keyboards are error-prone for industrial/fast data entry. Build a custom on-screen oversized Numpad component for the 'Точење Горива' (Bus entry) screen so workers can enter data quickly without native keyboard shifting layout.",
+    "Form matching: Ensure the data collected maps exactly to the user's Excel structure: Date, Pumps 1-8 (Start, End, Diff), Shift (07-15h), Total Diff, and Bus list (Garage No, Liters, Card OK, Time).",
+    "Use Personality 5 (Brutalist). This means hard 0px borders (2pt max for emphasis), stark contrast, JetBrains Mono for all numbers, and absolute clarity. No soft shadows, no glassmorphism.",
+    "Keep 'Card OK' (Исправност Картице) as a fast binary toggle (Да/Не). Auto-capture 'Time' (Време точења) when the bus entry is submitted so the worker doesn't type it."
+  ]
+}

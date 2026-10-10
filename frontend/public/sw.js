@@ -1,4 +1,4 @@
-const CACHE = "prva-smena-v1";
+const CACHE = "prva-smena-v2";
 const CORE = ["/", "/index.html", "/manifest.json", "/fonts/Roboto-Regular.ttf", "/fonts/Roboto-Bold.ttf", "/img/hero.jpg", "/img/icon-192.png"];
 
 self.addEventListener("install", (e) => {

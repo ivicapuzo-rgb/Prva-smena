@@ -10,7 +10,7 @@ export default function Smena() {
   return (
     <div data-testid="smena-page">
       <header className="relative h-64 overflow-hidden">
-        <img src="/img/hero.jpg" alt="Radno mesto evidentičara" className="absolute inset-0 h-full w-full object-cover" />
+        <img src="/img/hero.jpg" alt="Radno mesto evidentičara" className="absolute inset-0 h-full w-full object-cover object-[center_40%]" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-black/30" />
         <div className="absolute left-4 right-4 top-4 flex items-center justify-between">
           <SyncBadge dark />

@@ -1,4 +1,5 @@
 import { Image } from "expo-image";
+import { useRouter } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
 import { Pressable, Text, TextInput, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
@@ -11,7 +12,8 @@ import { usesNativeTabs } from "@/src/navigation";
 import { fonts, makeStyles, useTheme } from "@/src/theme";
 
 export default function Smena() {
-  const { day, buses, addArrival, removeArrival, showToast, logout } = useApp();
+  const { day, buses, addArrival, removeArrival, showToast, logout, unlocked } = useApp();
+  const router = useRouter();
   const insets = useSafeAreaInsets();
   const bottomChrome = usesNativeTabs ? insets.bottom : 0;
   const s = useStyles();
@@ -63,8 +65,8 @@ export default function Smena() {
               <Icon name="cloud-check-outline" size={14} color={colors.success} />
               <Text style={[s.badgeText, { color: colors.success }]}>SINHRONIZOVANO</Text>
             </View>
-            <Pressable testID="admin-badge" onPress={() => setAdminOpen(true)} style={s.adminBadge}>
-              <Icon name="shield-check-outline" size={14} color={colors.onSurfaceInverse} />
+            <Pressable testID="admin-badge" onPress={() => (unlocked ? setAdminOpen(true) : router.navigate("/izvestaj"))} style={s.adminBadge}>
+              <Icon name={unlocked ? "shield-check-outline" : "lock-outline"} size={14} color={colors.onSurfaceInverse} />
               <Text style={s.badgeText}>ADMIN</Text>
             </Pressable>
           </View>
@@ -179,7 +181,7 @@ export default function Smena() {
       <Sheet visible={adminOpen} onClose={() => setAdminOpen(false)} testID="admin-sheet">
         <Text style={s.formTitle}>Admin</Text>
         <Text style={s.label}>Prijavljeni ste kao administrator.</Text>
-        <Btn testID="logout-button" label="ODJAVI SE" icon="logout" variant="red" onPress={() => { setAdminOpen(false); logout(); }} />
+        <Btn testID="admin-logout-button" label="ODJAVI SE" icon="logout" variant="red" onPress={() => { setAdminOpen(false); logout(); }} />
         <Btn testID="admin-close-button" label="ZATVORI" variant="outline" onPress={() => setAdminOpen(false)} />
       </Sheet>
     </View>

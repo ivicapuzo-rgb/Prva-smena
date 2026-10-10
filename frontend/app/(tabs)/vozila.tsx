@@ -3,6 +3,7 @@ import { FlatList, Pressable, ScrollView, Text, TextInput, View } from "react-na
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useApp } from "@/src/app-store";
+import { AdminGate } from "@/src/components/admin-gate";
 import { Btn, DateNav, Icon, tap } from "@/src/components/kit";
 import { DEFAULT_BUSES } from "@/src/data/buses";
 import { usesNativeTabs } from "@/src/navigation";
@@ -15,7 +16,15 @@ const FILTERS: { key: Filter; label: string }[] = [
   { key: "nisu", label: "Nisu došla" },
 ];
 
-export default function Vozila() {
+export default function VozilaScreen() {
+  return (
+    <AdminGate title="Vozila">
+      <Vozila />
+    </AdminGate>
+  );
+}
+
+function Vozila() {
   const { buses, setBuses, day, showToast } = useApp();
   const insets = useSafeAreaInsets();
   const bottomChrome = usesNativeTabs ? insets.bottom : 0;

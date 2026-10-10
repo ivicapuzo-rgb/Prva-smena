@@ -3,13 +3,22 @@ import { ScrollView, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Day, DAY_NAMES, dayLiters, displayDate, fmt, loadDay, shortDate, useApp, weekDates } from "@/src/app-store";
+import { AdminGate } from "@/src/components/admin-gate";
 import { Btn, Card, CardTitle, DateNav } from "@/src/components/kit";
 import { usesNativeTabs } from "@/src/navigation";
 import { exportDayExcel, exportDayPdf, exportWeekPdf, pumpStats, shareWeekText } from "@/src/reports";
 import { fonts, makeStyles, useTheme } from "@/src/theme";
 
-export default function Izvestaj() {
-  const { day, date, buses, version, showToast } = useApp();
+export default function IzvestajScreen() {
+  return (
+    <AdminGate title="Izveštaj">
+      <Izvestaj />
+    </AdminGate>
+  );
+}
+
+function Izvestaj() {
+  const { day, date, buses, version, showToast, logout } = useApp();
   const insets = useSafeAreaInsets();
   const bottomChrome = usesNativeTabs ? insets.bottom : 0;
   const s = useStyles();
@@ -46,7 +55,10 @@ export default function Izvestaj() {
   return (
     <View style={s.root}>
       <ScrollView contentContainerStyle={[s.content, { paddingTop: insets.top + 16, paddingBottom: bottomChrome + 24 }]}>
-        <Text style={s.title}>Izveštaj</Text>
+        <View style={s.titleRow}>
+          <Text style={s.title}>Izveštaj</Text>
+          <Btn testID="logout-button" label="Odjava" icon="logout" variant="outline" style={s.logout} onPress={logout} />
+        </View>
         <DateNav />
 
         <Card testID="report-arrivals">
@@ -56,11 +68,10 @@ export default function Izvestaj() {
           {arrivals.length === 0 ? (
             <Text style={s.emptyText}>Nema vozila za {displayDate(date)}.</Text>
           ) : (
-            arrivals.map((a, i) => (
+            arrivals.map((a) => (
               <View key={a.id} style={s.arrRow} testID={`report-arrival-${a.bus}`}>
-                <Text style={s.arrIdx}>{i + 1}.</Text>
-                <Text style={s.arrTime}>{a.time}</Text>
                 <Text style={s.arrBus}>{a.bus}</Text>
+                <Text style={s.arrTime}>{a.time}</Text>
                 <View style={{ flex: 1 }}>
                   <Text style={s.arrInfo}>Pumpa {a.pump} · {a.qty} L</Text>
                   {!!a.note && <Text style={s.arrNote} numberOfLines={2}>{a.note}</Text>}
@@ -131,8 +142,8 @@ export default function Izvestaj() {
           <CardTitle icon="file-document-outline">Dnevna lista točenja</CardTitle>
           <Text style={s.muted}>Obrazac QF-E-003 za {displayDate(date)} · {arrivals.length} vozila · {fmt(dayLiters(day))} L</Text>
           <View style={s.btnRow}>
-            <Btn testID="day-excel-button" label="Excel" icon="file-excel-outline" variant="red" style={{ flex: 1 }} loading={busy === "dx"} onPress={() => run("dx", () => exportDayExcel(day, buses))} />
-            <Btn testID="day-pdf-button" label="PDF" icon="file-pdf-box" variant="red" style={{ flex: 1 }} loading={busy === "dp"} onPress={() => run("dp", () => exportDayPdf(day))} />
+            <Btn testID="day-excel-button" label="Excel" icon="file-excel-outline" variant="red" style={{ flex: 1 }} loading={busy === "dx"} onPress={() => run("dx", () => exportDayExcel(day))} />
+            <Btn testID="day-pdf-button" label="PDF" icon="file-pdf-box" variant="red" style={{ flex: 1 }} loading={busy === "dp"} onPress={() => run("dp", () => exportDayPdf(day, buses))} />
           </View>
         </Card>
       </ScrollView>
@@ -143,13 +154,14 @@ export default function Izvestaj() {
 const useStyles = makeStyles((c) => ({
   root: { flex: 1, backgroundColor: c.surface },
   content: { paddingHorizontal: 16, gap: 24 },
-  title: { fontFamily: fonts.wide, fontSize: 34, color: c.onSurface, marginBottom: -8 },
+  titleRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: -8 },
+  title: { fontFamily: fonts.wide, fontSize: 30, color: c.onSurface },
+  logout: { minHeight: 44, paddingHorizontal: 12 },
   cardHead: { fontFamily: fonts.semibold, fontSize: 23, color: c.onSurface },
   emptyText: { fontFamily: fonts.medium, fontSize: 16, color: c.muted },
   arrRow: { flexDirection: "row", alignItems: "flex-start", gap: 10, paddingVertical: 8, borderTopWidth: 1, borderTopColor: c.divider },
-  arrIdx: { fontFamily: fonts.medium, fontSize: 16, color: c.muted, width: 24 },
   arrTime: { fontFamily: fonts.wide, fontSize: 13, color: c.onSurface, width: 56, marginTop: 3 },
-  arrBus: { fontFamily: fonts.bold, fontSize: 20, color: c.onSurface, width: 50 },
+  arrBus: { fontFamily: fonts.bold, fontSize: 20, color: c.onSurface, width: 56 },
   arrInfo: { fontFamily: fonts.semibold, fontSize: 16, color: c.onSurfaceTertiary },
   arrNote: { fontFamily: fonts.medium, fontSize: 14, color: c.brandPrimary },
   total: { fontFamily: fonts.medium, fontSize: 16, color: c.onSurfaceTertiary },

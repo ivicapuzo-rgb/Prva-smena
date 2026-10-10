@@ -23,6 +23,12 @@ Expo Router (no backend). AsyncStorage via src/utils/storage (per-day shift keys
 - Data model: per-day arrivals {bus, pump, qty, time, note}; old pump-meter screens removed
 - Fonts: Anton, Michroma, Barlow Condensed
 
+## Iteration 3 (2026-06)
+- Smena tab open without login; Vozila + Izveštaj are admin panel (password puzopb, in-tab gate)
+- Excel export fills the ORIGINAL uploaded xlsx (embedded base64, JSZip): only qty + time next to garage number, date in O3; logo/styles/formulas preserved
+- Daily PDF redesigned to match reference (red headers, pump table, SMENA, UKUPNA RAZLIKA, EVRODIZEL sorted, filled row highlighted, paginated)
+- Izveštaj list order: garage number → time → pump/qty
+
 ## Backlog
 - P1: Monthly summary per bus; backup/restore file
 - P2: Custom pump count / shift times

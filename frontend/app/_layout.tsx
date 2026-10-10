@@ -15,7 +15,7 @@ import { useTheme } from "@/src/theme";
 LogBox.ignoreAllLogs(true);
 
 function RootStack() {
-  const { ready, unlocked } = useApp();
+  const { ready } = useApp();
   const { colors } = useTheme();
   if (!ready) {
     return (
@@ -27,12 +27,7 @@ function RootStack() {
   return (
     <>
       <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.surface } }}>
-        <Stack.Protected guard={!unlocked}>
-          <Stack.Screen name="login" />
-        </Stack.Protected>
-        <Stack.Protected guard={unlocked}>
-          <Stack.Screen name="(tabs)" />
-        </Stack.Protected>
+        <Stack.Screen name="(tabs)" />
       </Stack>
       <ToastHost />
     </>

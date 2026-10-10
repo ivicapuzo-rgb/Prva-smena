@@ -2,9 +2,9 @@ import { File, Paths } from "expo-file-system";
 import * as Print from "expo-print";
 import * as Sharing from "expo-sharing";
 import { Platform, Share } from "react-native";
-import * as XLSX from "xlsx";
 
 import { Day, DAY_NAMES, dayLiters, displayDate, fmt, num, shortDate } from "@/src/app-store";
+import { fillTemplate } from "@/src/xlsx-template";
 
 const TITLE = "LISTA TOČENJA GORIVA - NOVI BEOGRAD";
 const sorted = (d: Day) => [...d.arrivals].sort((a, b) => a.time.localeCompare(b.time));
@@ -16,101 +16,28 @@ export const pumpStats = (d: Day) =>
     return { pump: i + 1, count: list.length, liters: list.reduce((s, a) => s + num(a.qty), 0) };
   });
 
-function buildWorkbook(day: Day, buses: string[]) {
-  const aoa: (string | number | null)[][] = [];
-  const merges: XLSX.Range[] = [];
-  const set = (r: number, c: number, v: string | number | null) => {
-    while (aoa.length <= r) aoa.push(new Array(16).fill(null));
-    aoa[r][c] = v;
-  };
-  const m = (r1: number, c1: number, r2: number, c2: number) => merges.push({ s: { r: r1, c: c1 }, e: { r: r2, c: c2 } });
-
-  set(0, 15, "QF-E-003");
-  set(2, 13, "DATUM:");
-  set(2, 14, displayDate(day.date));
-  set(2, 15, "god.");
-  set(3, 5, TITLE);
-  m(3, 5, 3, 11);
-  set(5, 1, '"SP Novi Beograd"');
-
-  const stats = pumpStats(day);
-  stats.forEach((p, i) => {
-    const r = 6 + (i % 4) * 2;
-    const c0 = i < 4 ? 0 : 9;
-    set(r, c0, `Automat  ${p.pump}`);
-    m(r, c0, r + 1, c0);
-    set(r, c0 + 1, "Broj vozila");
-    m(r, c0 + 1, r, c0 + 2);
-    set(r, c0 + 3, p.count);
-    set(r + 1, c0 + 1, "Točeno (L)");
-    m(r + 1, c0 + 1, r + 1, c0 + 2);
-    set(r + 1, c0 + 3, Number(p.liters.toFixed(2)));
-  });
-  set(15, 4, "SMENA");
-  m(15, 4, 15, 6);
-  set(15, 7, "Od  07h");
-  set(15, 8, "Do");
-  set(15, 9, "15h");
-  set(16, 4, "UKUPNO TOČENO (L)");
-  m(16, 4, 16, 6);
-  set(16, 7, Number(dayLiters(day).toFixed(2)));
-  m(16, 7, 16, 9);
-
-  set(18, 0, "EVRODIZEL");
-  m(18, 0, 18, 15);
-  const heads = ["G.br.", "Točena količina", "Mesto sipanja", "Vreme točenja"];
-  for (let g = 0; g < 4; g++) heads.forEach((h, k) => set(19, g * 4 + k, h));
-  const byBus = new Map(day.arrivals.map((a) => [a.bus, a]));
-  const rows = Math.ceil(buses.length / 4);
-  for (let r = 0; r < rows; r++)
-    for (let g = 0; g < 4; g++) {
-      const b = buses[g * rows + r];
-      if (!b) continue;
-      const a = byBus.get(b);
-      set(20 + r, g * 4, Number(b));
-      set(20 + r, g * 4 + 1, a ? num(a.qty) : null);
-      set(20 + r, g * 4 + 2, a ? a.pump : null);
-      set(20 + r, g * 4 + 3, a ? a.time : null);
-    }
-  let r = 20 + rows + 1;
-  const notes = sorted(day).filter((a) => a.note.trim());
-  if (notes.length) {
-    set(r++, 0, "NAPOMENE");
-    notes.forEach((a) => {
-      set(r, 0, Number(a.bus));
-      set(r, 1, `${a.time} — ${a.note}`);
-      m(r, 1, r, 10);
-      r++;
-    });
-    r++;
-  }
-  set(r, 1, "Evidentičar");
-  set(r, 12, "Radnik Knez Petrol-a");
-  set(r + 1, 1, "____________________");
-  set(r + 1, 12, "____________________");
-
-  const ws = XLSX.utils.aoa_to_sheet(aoa);
-  ws["!merges"] = merges;
-  ws["!cols"] = Array.from({ length: 16 }, (_, i) => ({ wch: i % 4 === 0 ? 8 : 12 }));
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
-  return wb;
-}
-
 async function shareFile(file: File, mime: string, uti: string) {
   await Sharing.shareAsync(file.uri, { mimeType: mime, UTI: uti, dialogTitle: file.name });
 }
 
-export async function exportDayExcel(day: Day, buses: string[]) {
-  const wb = buildWorkbook(day, buses);
+export async function exportDayExcel(day: Day) {
+  const bytes = await fillTemplate(day);
   const name = `Tocenje_${displayDate(day.date)}.xlsx`;
-  if (Platform.OS === "web") return void XLSX.writeFile(wb, name);
-  const arr = XLSX.write(wb, { type: "array", bookType: "xlsx" }) as ArrayBuffer;
+  const mime = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+  if (Platform.OS === "web") {
+    const url = URL.createObjectURL(new Blob([bytes as BlobPart], { type: mime }));
+    const a = (globalThis as any).document.createElement("a");
+    a.href = url;
+    a.download = name;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+    return;
+  }
   const f = new File(Paths.cache, name);
   if (f.exists) f.delete();
   f.create();
-  f.write(new Uint8Array(arr));
-  await shareFile(f, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "org.openxmlformats.spreadsheetml.sheet");
+  f.write(bytes);
+  await shareFile(f, mime, "org.openxmlformats.spreadsheetml.sheet");
 }
 
 async function pdf(html: string, name: string) {
@@ -127,21 +54,98 @@ table{border-collapse:collapse;width:100%;margin-top:8px}td,th{border:1px solid 
 h1{font-size:16px;text-align:center}h2{font-size:13px;margin:14px 0 4px}.r{text-align:right}</style>`;
 
 const arrivalsTable = (d: Day) =>
-  `<table><tr><th>#</th><th>Vreme</th><th>G.br.</th><th>Mesto sipanja</th><th>Količina (L)</th><th>Napomena</th></tr>${sorted(d)
-    .map((a, i) => `<tr><td>${i + 1}</td><td>${a.time}</td><td><b>${a.bus}</b></td><td>${a.pump}</td><td class="r">${esc(a.qty)}</td><td>${esc(a.note)}</td></tr>`)
+  `<table><tr><th>G.br.</th><th>Vreme</th><th>Mesto sipanja</th><th>Količina (L)</th><th>Napomena</th></tr>${sorted(d)
+    .map((a) => `<tr><td><b>${a.bus}</b></td><td>${a.time}</td><td>${a.pump}</td><td class="r">${esc(a.qty)}</td><td>${esc(a.note)}</td></tr>`)
     .join("")}</table>`;
 
-export async function exportDayPdf(day: Day) {
-  const stats = pumpStats(day);
-  const html = `<html><head><meta charset="utf-8"/>${CSS}</head><body>
-  <div style="display:flex;justify-content:space-between"><b>GSP BEOGRAD</b><span>QF-E-003 · DATUM: <b>${displayDate(day.date)}</b></span></div>
-  <h1>${TITLE}</h1><div>Prva smena 07h – 15h · "SP Novi Beograd"</div>
-  <table><tr>${stats.map((p) => `<th>Pumpa ${p.pump}</th>`).join("")}</tr>
-  <tr>${stats.map((p) => `<td class="r">${p.count} voz. / ${fmt(p.liters)} L</td>`).join("")}</tr></table>
-  <h2>Stigli – redom po vremenu (${day.arrivals.length}) · Ukupno: ${fmt(dayLiters(day))} L</h2>${arrivalsTable(day)}
-  <div style="display:flex;justify-content:space-between;margin-top:30px"><div>Evidentičar<br/><br/>____________________</div><div>Radnik Knez Petrol-a<br/><br/>____________________</div></div>
+const PDF_CSS = `<style>
+@page{size:A4 portrait;margin:9mm}
+body{font-family:Arial,Helvetica,sans-serif;color:#111;font-size:9px;margin:0}
+.code{text-align:right;font-weight:bold;font-size:11px}
+.date{text-align:right;font-size:11px;margin-top:6px}
+h1{text-align:center;font-size:15px;margin:6px 0 10px}
+.sp{font-size:11px;margin-bottom:6px}
+table{border-collapse:collapse;width:100%}
+td,th{border:1px solid #bbb;padding:0 4px;height:15px}
+th{background:#E10600;color:#fff;font-weight:bold;text-align:left;font-size:9.5px;border-color:#E10600}
+.pumps td{font-size:9.5px;height:15px}
+.pumps .an{font-weight:bold;width:15%}
+.pumps .gap{border:none;width:6px}
+.meta{margin:14px 0 0 22%;font-size:11px;font-weight:bold;line-height:22px}
+.title{background:#E10600;color:#fff;text-align:center;font-weight:bold;font-size:10px;border-color:#E10600}
+.sub th{background:#fff;color:#111;text-align:center;font-size:7.5px;line-height:8px;border-color:#bbb;padding:2px}
+.bus td{height:13px;font-size:8px}
+.g{width:7%}.q{width:7%;text-align:right}.c{width:6%;text-align:center;color:#aaa;font-size:7px}.t{width:5%;text-align:center}
+.f{background:#FFF6D6}.f.q,.f.t{font-weight:bold}.f.g{font-weight:bold}
+.page{page-break-before:always;padding-top:4px}
+.sig{display:flex;justify-content:space-between;margin-top:26px;font-size:11px}
+</style>`;
+
+const PAGE1_ROWS = 38;
+const PAGE_ROWS = 62;
+
+function busPages(buses: string[]) {
+  const list = [...buses].sort((a, b) => Number(a) - Number(b));
+  const pages: string[][] = [];
+  let i = 0;
+  let size = PAGE1_ROWS * 4;
+  while (i < list.length) {
+    pages.push(list.slice(i, i + size));
+    i += size;
+    size = PAGE_ROWS * 4;
+  }
+  return pages;
+}
+
+function busTable(page: string[], day: Day) {
+  const byBus = new Map(day.arrivals.map((a) => [a.bus, a]));
+  const rows = Math.ceil(page.length / 4);
+  const head = Array(4).fill('<th>G.br.</th><th>Točena količina</th><th>Ispravnost kartice</th><th>Vreme točenja</th>').join("");
+  let body = "";
+  for (let r = 0; r < rows; r++) {
+    body += "<tr>";
+    for (let g = 0; g < 4; g++) {
+      const b = page[g * rows + r];
+      const a = b ? byBus.get(b) : undefined;
+      const f = a ? " f" : "";
+      body += b
+        ? `<td class="g${f}">${b}</td><td class="q${f}">${a ? esc(a.qty) : ""}</td><td class="c${f}">da / ne</td><td class="t${f}">${a ? a.time : ""}</td>`
+        : '<td class="g"></td><td class="q"></td><td class="c"></td><td class="t"></td>';
+    }
+    body += "</tr>";
+  }
+  return `<table class="bus"><tr><th colspan="16" class="title">EVRODIZEL</th></tr><tr class="sub">${head}</tr>${body}</table>`;
+}
+
+export function dayPdfHtml(day: Day, buses: string[]) {
+  let pumps = "";
+  for (let i = 0; i < 4; i++) {
+    const side = (n: number) => [
+      `<td rowspan="2" class="an">Automat ${n}</td><td>Početno stanje</td><td></td><td rowspan="2"></td>`,
+      `<td>Završno stanje</td><td></td>`,
+    ];
+    const [l1, l2] = side(i + 1);
+    const [r1, r2] = side(i + 5);
+    pumps += `<tr>${l1}<td class="gap" rowspan="2"></td>${r1}</tr><tr>${l2}${r2}</tr>`;
+  }
+  const pages = busPages(buses);
+  const notes = sorted(day).filter((a) => a.note.trim());
+  return `<html><head><meta charset="utf-8"/>${PDF_CSS}</head><body>
+  <div class="code">QF-E-003</div>
+  <div class="date">DATUM: ${displayDate(day.date)}. god.</div>
+  <h1>${TITLE}</h1>
+  <div class="sp">"SP Novi Beograd"</div>
+  <table class="pumps"><tr><th>Automat</th><th>Stanje</th><th>Vrednost</th><th>Razlika</th><th class="gap" style="background:#fff;border:none"></th><th>Automat</th><th>Stanje</th><th>Vrednost</th><th>Razlika</th></tr>${pumps}</table>
+  <div class="meta">SMENA&nbsp;&nbsp; Od 07h&nbsp;&nbsp; Do 15h<br/>UKUPNA RAZLIKA:&nbsp; 0</div>
+  <div style="margin-top:12px">${busTable(pages[0] ?? [], day)}</div>
+  ${pages.slice(1).map((p) => `<div class="page">${busTable(p, day)}</div>`).join("")}
+  ${notes.length ? `<div style="margin-top:14px;font-size:10px"><b>NAPOMENE</b><br/>${notes.map((a) => `${a.bus} · ${a.time} — ${esc(a.note)}`).join("<br/>")}</div>` : ""}
+  <div class="sig"><div>Evidentičar<br/><br/>______________________</div><div>Radnik Knez Petrol-a<br/><br/>______________________</div></div>
   </body></html>`;
-  await pdf(html, `Tocenje_${displayDate(day.date)}.pdf`);
+}
+
+export async function exportDayPdf(day: Day, buses: string[]) {
+  await pdf(dayPdfHtml(day, buses), `Tocenje_${displayDate(day.date)}.pdf`);
 }
 
 const weekLabel = (days: Day[]) => `${shortDate(days[0].date)}-${shortDate(days[6].date)}`;

@@ -1,0 +1,71 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    --ps-red: #e10600;
+    --ps-amber: #f5a623;
+    --ps-blue: #0070c0;
+    --ps-green: #16a34a;
+    --ps-ink: #0b0b0b;
+}
+
+body {
+    margin: 0;
+    font-family: "Barlow", sans-serif;
+    color: var(--ps-ink);
+    background: #f1f1ef;
+    -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.font-display { font-family: "Anton", sans-serif; letter-spacing: 0.01em; }
+.font-digits { font-family: "Michroma", sans-serif; }
+.font-cond { font-family: "Barlow Condensed", sans-serif; }
+
+::selection { background: var(--ps-amber); color: #000; }
+
+@keyframes rise {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.rise { animation: rise 0.45s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+.rise-1 { animation-delay: 0.05s; }
+.rise-2 { animation-delay: 0.12s; }
+.rise-3 { animation-delay: 0.19s; }
+.rise-4 { animation-delay: 0.26s; }
+.rise-5 { animation-delay: 0.33s; }
+
+.press { transition: transform 0.12s ease, background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease; }
+.press:active { transform: scale(0.96); }
+
+input[type="date"], input[type="time"] { font-family: "Barlow Condensed", sans-serif; }
+
+@layer base {
+    :root {
+        --background: 0 0% 100%;
+        --foreground: 0 0% 3.9%;
+        --card: 0 0% 100%;
+        --card-foreground: 0 0% 3.9%;
+        --popover: 0 0% 100%;
+        --popover-foreground: 0 0% 3.9%;
+        --primary: 1 100% 44%;
+        --primary-foreground: 0 0% 98%;
+        --secondary: 0 0% 96.1%;
+        --secondary-foreground: 0 0% 9%;
+        --muted: 0 0% 96.1%;
+        --muted-foreground: 0 0% 40%;
+        --accent: 0 0% 96.1%;
+        --accent-foreground: 0 0% 9%;
+        --destructive: 0 84.2% 60.2%;
+        --destructive-foreground: 0 0% 98%;
+        --border: 0 0% 89.8%;
+        --input: 0 0% 89.8%;
+        --ring: 37 91% 55%;
+        --radius: 0.75rem;
+    }
+}
+
+@layer base {
+    * { @apply border-border; }
+}

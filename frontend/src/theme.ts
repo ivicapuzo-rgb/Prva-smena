@@ -6,44 +6,56 @@ export type ColorScheme = "light" | "dark";
 
 const light = {
   surface: "#FFFFFF",
-  onSurface: "#09090B",
-  surfaceSecondary: "#F4F4F5",
-  onSurfaceSecondary: "#09090B",
-  surfaceTertiary: "#E4E4E7",
-  onSurfaceTertiary: "#09090B",
-  surfaceInverse: "#09090B",
+  onSurface: "#0A0A0A",
+  surfaceSecondary: "#F7F7F7",
+  onSurfaceSecondary: "#0A0A0A",
+  surfaceTertiary: "#EEEEEE",
+  onSurfaceTertiary: "#3A3A3A",
+  surfaceInverse: "#111111",
   onSurfaceInverse: "#FFFFFF",
-  muted: "#71717A",
+  muted: "#9A9A9A",
+  placeholder: "#C4C4C4",
 
-  brand: "#F97316",
+  brand: "#E10600",
   onBrand: "#FFFFFF",
-  brandPrimary: "#EA580C",
+  brandPrimary: "#E10600",
   onBrandPrimary: "#FFFFFF",
-  brandSecondary: "#C2410C",
+  brandSecondary: "#C8102E",
   onBrandSecondary: "#FFFFFF",
-  brandTertiary: "#FFEDD5",
-  onBrandTertiary: "#9A3412",
+  brandTertiary: "#FDECEC",
+  onBrandTertiary: "#C8102E",
 
-  success: "#16A34A",
+  accent: "#F2A623",
+  onAccent: "#0A0A0A",
+  accentSoft: "#FFF6E5",
+  blue: "#1565C0",
+  onBlue: "#FFFFFF",
+  heroTitle: "#F5A623",
+  overlay: "rgba(0,0,0,0.45)",
+  badgeDark: "rgba(20,20,20,0.75)",
+
+  success: "#22C55E",
   onSuccess: "#FFFFFF",
-  warning: "#EAB308",
+  warning: "#F2A623",
   onWarning: "#000000",
-  error: "#DC2626",
+  error: "#E10600",
   onError: "#FFFFFF",
-  info: "#09090B",
+  info: "#1565C0",
   onInfo: "#FFFFFF",
 
-  border: "#E4E4E7",
-  borderStrong: "#27272A",
-  divider: "#E4E4E7",
+  border: "#E5E5E5",
+  borderStrong: "#111111",
+  divider: "#EEEEEE",
 };
 
 export type ThemeColors = typeof light;
 
 export const fonts = {
-  regular: "Mono",
-  bold: "MonoBold",
-  display: "MonoXB",
+  display: "Anton",
+  wide: "Michroma",
+  medium: "BarlowM",
+  semibold: "BarlowSB",
+  bold: "BarlowB",
 };
 
 export const spacing = { xs: 4, sm: 8, md: 12, lg: 16, xl: 24, xxl: 32, xxxl: 48 };

@@ -6,10 +6,10 @@ import { ActivityIndicator, LogBox, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 
+import { AppProvider, useApp } from "@/src/app-store";
 import { ErrorBoundary } from "@/src/components/error-boundary";
-import { ToastHost } from "@/src/components/ui";
+import { ToastHost } from "@/src/components/kit";
 import { queryClient } from "@/src/query-client";
-import { AppProvider, useApp } from "@/src/store";
 import { useTheme } from "@/src/theme";
 
 LogBox.ignoreAllLogs(true);
@@ -32,7 +32,6 @@ function RootStack() {
         </Stack.Protected>
         <Stack.Protected guard={unlocked}>
           <Stack.Screen name="(tabs)" />
-          <Stack.Screen name="buses" />
         </Stack.Protected>
       </Stack>
       <ToastHost />
@@ -42,9 +41,11 @@ function RootStack() {
 
 export default function RootLayout() {
   const [loaded] = useFonts({
-    Mono: require("../assets/fonts/JetBrainsMono-Regular.ttf"),
-    MonoBold: require("../assets/fonts/JetBrainsMono-Bold.ttf"),
-    MonoXB: require("../assets/fonts/JetBrainsMono-ExtraBold.ttf"),
+    Anton: require("../assets/fonts/Anton.ttf"),
+    Michroma: require("../assets/fonts/Michroma.ttf"),
+    BarlowM: require("../assets/fonts/BarlowCondensed-Medium.ttf"),
+    BarlowSB: require("../assets/fonts/BarlowCondensed-SemiBold.ttf"),
+    BarlowB: require("../assets/fonts/BarlowCondensed-Bold.ttf"),
   });
   if (!loaded) return null;
   return (
@@ -53,7 +54,7 @@ export default function RootLayout() {
         <QueryClientProvider client={queryClient}>
           <KeyboardProvider>
             <AppProvider>
-              <StatusBar style="dark" />
+              <StatusBar style="light" />
               <RootStack />
             </AppProvider>
           </KeyboardProvider>

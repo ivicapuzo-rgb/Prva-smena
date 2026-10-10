@@ -17,6 +17,12 @@ Expo Router (no backend). AsyncStorage via src/utils/storage (per-day shift keys
 - Историја: saved shifts, Excel/PDF export, open, delete
 - Bus list management (276 default numbers from form)
 
+## Redesign (2026-06, iteration 2)
+- Switched to Latin script, UI matched to user reference screenshots
+- Tabs: SMENA (hero photo, PRVA SMENA, date nav, DOŠLO counter, Unesi vozilo form: garažni broj, mesto sipanja 1-8, količina, auto vreme, napomena), VOZILA (list, filters, add/remove), IZVEŠTAJ (arrivals by time, pump stats + chart, weekly overview + PDF/share, daily Excel/PDF)
+- Data model: per-day arrivals {bus, pump, qty, time, note}; old pump-meter screens removed
+- Fonts: Anton, Michroma, Barlow Condensed
+
 ## Backlog
 - P1: Monthly summary per bus; backup/restore file
 - P2: Custom pump count / shift times

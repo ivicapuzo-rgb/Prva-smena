@@ -2,7 +2,7 @@ import { BarChart, Bar, XAxis, YAxis, Cell, ResponsiveContainer, LabelList } fro
 
 export const MiniBars = ({ data, xKey, highlight, testId, height = 170 }) => (
   <div style={{ height }} data-testid={testId}>
-    <ResponsiveContainer width="100%" height="100%">
+    <ResponsiveContainer width="100%" height="100%" minWidth={200} minHeight={100}>
       <BarChart data={data} margin={{ top: 18, right: 0, left: -28, bottom: 0 }}>
         <XAxis dataKey={xKey} tickLine={false} axisLine={false} interval={0}
           tick={{ fontFamily: "Barlow Condensed", fontSize: 11, fill: "#555" }} />

@@ -37,7 +37,7 @@ export const EditFuelingDialog = ({ fueling, onClose }) => {
 
   return (
     <Dialog open={!!fueling} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-h-[92vh] max-w-sm overflow-y-auto rounded-3xl" data-testid="edit-fueling-dialog">
+      <DialogContent aria-describedby={undefined} className="max-h-[92vh] max-w-sm overflow-y-auto rounded-3xl" data-testid="edit-fueling-dialog">
         <DialogHeader><DialogTitle className="font-display text-3xl font-normal">Izmena točenja</DialogTitle></DialogHeader>
         <div className="space-y-4">
           <Field label="Garažni broj">

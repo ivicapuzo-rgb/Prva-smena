@@ -37,7 +37,7 @@ const AddVehicle = ({ open, onClose }) => {
   };
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-w-sm rounded-3xl" data-testid="add-vehicle-dialog">
+      <DialogContent aria-describedby={undefined} className="max-w-sm rounded-3xl" data-testid="add-vehicle-dialog">
         <DialogHeader><DialogTitle className="font-display text-3xl font-normal">Dodaj vozilo</DialogTitle></DialogHeader>
         <input autoFocus value={g} onChange={(e) => setG(e.target.value.replace(/\D/g, ""))} inputMode="numeric" placeholder="npr. 7700"
           className={inputCls} data-testid="add-vehicle-input" onKeyDown={(e) => e.key === "Enter" && save()} />
